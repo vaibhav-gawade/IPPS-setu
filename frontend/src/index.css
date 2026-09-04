@@ -65,6 +65,7 @@
   --bg-card-hover: #0f2545;
   --bg-sidebar: #060f20;
   --bg-input: #0a1628;
+  --bg-table-head: var(--navy-900);
 
   --text-primary: #e8f0fe;
   --text-secondary: #94a3b8;
@@ -101,6 +102,20 @@
   --radius-lg: 14px;
   --radius-xl: 20px;
   --radius-full: 9999px;
+}
+
+html.light {
+  --bg-primary: var(--gray-50);
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: var(--gray-50);
+  --bg-sidebar: #ffffff;
+  --bg-input: var(--white);
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-700);
+  --text-muted: var(--gray-500);
+  --border-color: var(--gray-200);
+  --bg-table-head: var(--gray-100);
 }
 
 /* ========== RESET & BASE ========== */
@@ -681,7 +696,7 @@ ul, ol {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  background: var(--navy-900);
+  background: var(--bg-table-head);
   border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
 }

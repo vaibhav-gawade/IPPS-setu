@@ -1,12 +1,12 @@
 // src/layouts/GovernmentLayout.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import Logo from '../components/Logo';
 import {
   LayoutDashboard, Target, Users, Cpu, Star, Beaker, ShoppingCart,
   CreditCard, TrendingUp, FileText, Bell, LogOut, ChevronRight,
-  Settings, Menu, X
+  Settings, Menu, X, Sun, Moon
 } from 'lucide-react';
 
 const navItems = [
@@ -37,6 +37,18 @@ export default function GovernmentLayout({ children }) {
   const location = useLocation();
   const { user, logout } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('ipps-theme') || 'dark');
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+    localStorage.setItem('ipps-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   const handleLogout = async () => {
     await logout();
@@ -130,7 +142,7 @@ export default function GovernmentLayout({ children }) {
             {pipelineSteps.map((step, idx) => (
               <div key={step.label} className="pipeline-step">
                 <button
-                  className="pipeline-step-btn"
+                  className={`pipeline-step-btn ${isActive(step.path) ? 'active' : ''}`}
                   onClick={() => navigate(step.path)}
                 >
                   <span className={`pipeline-step-count ${idx === 0 ? 'orange' : ''}`}>{step.count}</span>
@@ -149,6 +161,12 @@ export default function GovernmentLayout({ children }) {
               Transparent · Rule-based · Auditable
             </div>
 
+            <div style={{ position: 'relative' }}>
+              <button className="btn btn-icon btn-secondary" onClick={toggleTheme} title="Toggle Theme" style={{ marginRight: '8px' }}>
+                {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+              </button>
+            </div>
+            
             <div style={{ position: 'relative' }}>
               <button className="btn btn-icon btn-secondary">
                 <Bell size={17} />
