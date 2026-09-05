@@ -53,10 +53,14 @@ async def create_status_check(input: StatusCheckCreate):
     _ = await db.status_checks.insert_one(status_obj.model_dump())
     return status_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
+@api_router.get("/status")
 async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+    try:
+        status_checks = await db.status_checks.find().to_list(1000)
+        return {"success": True, "data": status_checks}
+    except Exception as e:
+        logger.exception("MongoDB error")
+        return {"success": False, "error": str(e)}
 
 # Include the router in the main app
 app.include_router(api_router)
