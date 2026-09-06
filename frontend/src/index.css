@@ -1918,3 +1918,140 @@ ul, ol {
   .app-sidebar .sidebar-item:hover, .tag:hover, .stat-chip:hover,
   .timeline-node:hover .timeline-node-dot { transform: none; }
 }
+
+/* =========================================================
+   CUSTOM MARKETPLACE DROPDOWNS
+   ========================================================= */
+
+.custom-filter-dropdown {
+  position: relative;
+  width: 190px;
+  flex-shrink: 0;
+}
+
+.custom-filter-trigger {
+  width: 100%;
+  min-height: 44px;
+  padding: 7px 12px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+  text-align: left;
+}
+
+.custom-filter-trigger:hover {
+  border-color: rgba(13, 148, 136, 0.35);
+  background: #fdfefe;
+}
+
+.custom-filter-trigger-open {
+  border-color: var(--teal-500);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.10);
+}
+
+.custom-filter-arrow {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms ease;
+}
+
+.custom-filter-trigger-open .custom-filter-arrow {
+  color: var(--teal-600);
+}
+
+.custom-filter-arrow-open {
+  transform: rotate(180deg);
+}
+
+.custom-filter-menu {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  width: 100%;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 12px 30px rgba(10, 31, 60, 0.12),
+    0 4px 10px rgba(10, 31, 60, 0.06);
+  z-index: 1000;
+  animation: customDropdownIn 160ms ease-out;
+}
+
+@keyframes customDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-filter-option {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  color: #334155;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.custom-filter-option:hover {
+  background: #eef9f8;
+  color: var(--teal-600);
+}
+
+.custom-filter-option-selected {
+  background: rgba(13, 148, 136, 0.10);
+  color: var(--teal-600);
+  font-weight: 600;
+}
+
+.custom-filter-option-selected:hover {
+  background: rgba(13, 148, 136, 0.14);
+}
+
+.custom-filter-check {
+  color: var(--teal-600);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .custom-filter-dropdown {
+    width: 100%;
+    max-width: 190px;
+  }
+}
