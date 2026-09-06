@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { mockChallenges } from '../../data/mockData';
-import { Sparkles, ChevronRight } from 'lucide-react';
+import { Sparkles, ChevronRight, ChevronDown } from 'lucide-react';
 
 export default function RecommendedPage() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('All');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Add mock match score and reasons to existing challenges
   const recommendations = mockChallenges.map((c, i) => ({
     ...c,
     matchScore: 98 - i * 5,
@@ -18,6 +18,17 @@ export default function RecommendedPage() {
     filter === 'All'
       ? recommendations
       : recommendations.filter((r) => r.category === filter);
+
+  const filterOptions = [
+    { value: 'All', label: 'All Categories' },
+    { value: 'Defense', label: 'Defense' },
+    { value: 'SpaceTech', label: 'SpaceTech' },
+    { value: 'AI', label: 'AI' },
+  ];
+
+  const selectedFilter =
+    filterOptions.find((option) => option.value === filter)?.label ||
+    'All Categories';
 
   return (
     <div className="page-enter">
@@ -31,16 +42,41 @@ export default function RecommendedPage() {
         </div>
 
         <div className="section-actions">
-          <select
-            className="filter-select"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option value="All">All Categories</option>
-            <option value="Defense">Defense</option>
-            <option value="SpaceTech">SpaceTech</option>
-            <option value="AI">AI</option>
-          </select>
+          <div className={`custom-filter ${dropdownOpen ? 'open' : ''}`}>
+            <button
+              type="button"
+              className="custom-filter-button"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+            >
+              <span>{selectedFilter}</span>
+              <ChevronDown
+                size={16}
+                className={`custom-filter-icon ${
+                  dropdownOpen ? 'rotate' : ''
+                }`}
+              />
+            </button>
+
+            {dropdownOpen && (
+              <div className="custom-filter-menu">
+                {filterOptions.map((option) => (
+                  <button
+                    type="button"
+                    key={option.value}
+                    className={`custom-filter-option ${
+                      filter === option.value ? 'selected' : ''
+                    }`}
+                    onClick={() => {
+                      setFilter(option.value);
+                      setDropdownOpen(false);
+                    }}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

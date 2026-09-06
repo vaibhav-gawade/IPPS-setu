@@ -1,11 +1,12 @@
 // src/layouts/StartupLayout.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import Logo from '../components/Logo';
 import {
   LayoutDashboard, Store, Star, FileText, Cpu, Beaker, FileSignature,
-  CreditCard, TrendingUp, User, FolderOpen, Bell, LogOut, ChevronRight, Menu, HandHeart
+  CreditCard, TrendingUp, User, FolderOpen, Bell, LogOut, ChevronRight, Menu, HandHeart,
+  Sun, Moon
 } from 'lucide-react';
 
 const navItems = [
@@ -29,6 +30,20 @@ export default function StartupLayout({ children }) {
   const location = useLocation();
   const { user, logout } = useApp();
   const [mobileOpen, setMobileOpen] = useState(false);
+  
+  // Theme State Logic
+  const [theme, setTheme] = useState(() => localStorage.getItem('ipps-theme') || 'dark');
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+    localStorage.setItem('ipps-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   const handleLogout = async () => {
     await logout();
@@ -119,6 +134,14 @@ export default function StartupLayout({ children }) {
           </div>
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+            
+            {/* Theme Toggle Button added here */}
+            <div style={{ position: 'relative' }}>
+              <button className="btn btn-icon btn-secondary" onClick={toggleTheme} title="Toggle Theme" style={{ marginRight: '8px' }}>
+                {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+              </button>
+            </div>
+
             <div style={{ position: 'relative' }}>
               <button className="btn btn-icon btn-secondary"><Bell size={17} /></button>
               <div className="notif-dot" />
