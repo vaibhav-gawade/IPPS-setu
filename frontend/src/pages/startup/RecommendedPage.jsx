@@ -42,38 +42,57 @@ export default function RecommendedPage() {
         </div>
 
         <div className="section-actions">
-          <div className={`custom-filter ${dropdownOpen ? 'open' : ''}`}>
+          <div className="custom-filter-dropdown">
             <button
               type="button"
-              className="custom-filter-button"
+              className={`custom-filter-trigger ${
+                dropdownOpen
+                  ? 'custom-filter-trigger-open'
+                  : ''
+              }`}
               onClick={() => setDropdownOpen(!dropdownOpen)}
             >
               <span>{selectedFilter}</span>
+
               <ChevronDown
                 size={16}
-                className={`custom-filter-icon ${
-                  dropdownOpen ? 'rotate' : ''
+                className={`custom-filter-arrow ${
+                  dropdownOpen
+                    ? 'custom-filter-arrow-open'
+                    : ''
                 }`}
               />
             </button>
 
             {dropdownOpen && (
               <div className="custom-filter-menu">
-                {filterOptions.map((option) => (
-                  <button
-                    type="button"
-                    key={option.value}
-                    className={`custom-filter-option ${
-                      filter === option.value ? 'selected' : ''
-                    }`}
-                    onClick={() => {
-                      setFilter(option.value);
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+                {filterOptions.map((option) => {
+                  const isSelected = filter === option.value;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={`custom-filter-option ${
+                        isSelected
+                          ? 'custom-filter-option-selected'
+                          : ''
+                      }`}
+                      onClick={() => {
+                        setFilter(option.value);
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      <span>{option.label}</span>
+
+                      {isSelected && (
+                        <span className="custom-filter-check">
+                          ✓
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
