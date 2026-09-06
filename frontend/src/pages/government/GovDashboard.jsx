@@ -50,8 +50,8 @@ const kpiCards = [
 ];
 
 const CUSTOM_TOOLTIP_STYLE = {
-  background: '#ffffff', border: '1px solid rgba(10,31,60,0.12)',
-  borderRadius: 8, fontSize: 12, color: '#e8f0fe',
+  background: 'var(--bg-card)', border: '1px solid var(--border-color)',
+  borderRadius: 8, fontSize: 12, color: 'var(--text-primary)',
 };
 
 export default function GovDashboard() {
@@ -62,9 +62,7 @@ export default function GovDashboard() {
   return (
     <div className="page-enter">
       {/* Hero Dashboard Card */}
-      <div style={{
-        background: 'linear-gradient(135deg, #ffffff 0%, rgba(13,148,136,0.10) 60%, rgba(6,182,212,0.12) 100%)',
-        border: '1px solid var(--border-accent)',
+      <div className="gov-hero-banner" style={{
         borderRadius: 'var(--radius-xl)',
         padding: '32px',
         marginBottom: 24,
@@ -126,7 +124,7 @@ export default function GovDashboard() {
               { label: 'TIME TO CONTRACT', value: stats.timeToContract },
               { label: 'BENEFICIARIES REACHED', value: stats.beneficiariesReached },
             ].map(m => (
-              <div key={m.label} style={{ borderLeft: '2px solid rgba(10,31,60,0.12)', paddingLeft: 16 }}>
+              <div key={m.label} style={{ borderLeft: '2px solid var(--border-color)', paddingLeft: 16 }}>
                 <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>{m.label}</div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 800, color: 'var(--text-primary)' }}>{m.value}</div>
               </div>

@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 import Logo from '../components/Logo';
 import {
   LayoutDashboard, Store, Star, FileText, Cpu, Beaker, FileSignature,
-  CreditCard, TrendingUp, User, FolderOpen, Bell, LogOut, ChevronRight, Menu, HandHeart,
+  CreditCard, TrendingUp, User, FolderOpen, Bell, LogOut, ChevronRight, X, HandHeart,
   Sun, Moon
 } from 'lucide-react';
 
@@ -25,11 +25,20 @@ const navItems = [
   { icon: Bell, label: 'Notifications', path: '/startup/notifications' },
 ];
 
+const pipelineSteps = [
+  { label: 'Marketplace', count: 8, path: '/startup/marketplace' },
+  { label: 'Applications', count: 3, path: '/startup/applications' },
+  { label: 'Matching', count: 4, path: '/startup/matching' },
+  { label: 'Pilots', count: 2, path: '/startup/pilots' },
+  { label: 'Contracts', count: 1, path: '/startup/contracts' },
+  { label: 'Scale-up', count: 1, path: '/startup/scaleup' },
+];
+
 export default function StartupLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useApp();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Theme State Logic
   const [theme, setTheme] = useState(() => localStorage.getItem('ipps-theme') || 'dark');
@@ -54,7 +63,7 @@ export default function StartupLayout({ children }) {
 
   const SidebarContent = () => (
     <>
-      <div className="sidebar-logo" onClick={() => navigate('/startup/dashboard')} style={{ cursor: 'pointer' }}>
+      <div className="sidebar-logo" onClick={() => navigate('/startup/dashboard')} style={{ cursor: 'pointer', padding: '16px' }}>
         <Logo />
       </div>
 
@@ -64,7 +73,7 @@ export default function StartupLayout({ children }) {
           <div
             key={path}
             className={`sidebar-item ${isActive(path) ? 'active' : ''}`}
-            onClick={() => { navigate(path); setMobileOpen(false); }}
+            onClick={() => navigate(path)}
           >
             <Icon className="sidebar-icon" size={18} />
             <span>{label}</span>
@@ -94,62 +103,102 @@ export default function StartupLayout({ children }) {
   );
 
   return (
-    <div className="app-layout">
-      <aside className="app-sidebar">
+    <div className={`app-layout ${sidebarOpen ? 'sidebar-open' : ''}`}>
+      {/* Collapsible Sidebar */}
+      <aside className="app-sidebar" aria-label="Startup Navigation">
         <SidebarContent />
       </aside>
 
-      {mobileOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
-          <div style={{ flex: 1, background: 'rgba(0,0,0,0.6)' }} onClick={() => setMobileOpen(false)} />
-          <aside style={{
-            width: 'var(--sidebar-width)',
-            background: 'var(--bg-sidebar)',
-            height: '100%',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRight: '1px solid var(--border-color)',
-            position: 'absolute',
-            left: 0,
-          }}>
-            <SidebarContent />
-          </aside>
-        </div>
-      )}
-
+      {/* Main App Content Area */}
       <div className="app-main">
         <header className="app-topbar">
-          <button className="btn btn-icon btn-secondary" id="mobile-menu-btn-su" style={{ display: 'none' }} onClick={() => setMobileOpen(true)}>
-            <Menu size={18} />
+          {/* 4-Bar Menu Toggle Button (Morphs to X when sidebar is open) */}
+          <button
+            type="button"
+            className={`nsp-menu-btn ${sidebarOpen ? 'open' : ''}`}
+            onClick={() => setSidebarOpen(prev => !prev)}
+            title={sidebarOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
+            aria-label={sidebarOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
+          >
+            <div className="nsp-menu-btn-lines">
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
           </button>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: 'var(--indigo-400)', fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 'var(--radius-full)' }}>
-              DPIIT Recognised
-            </span>
-            <span style={{ background: 'rgba(45,212,191,0.1)', border: '1px solid rgba(45,212,191,0.25)', color: 'var(--teal-400)', fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 'var(--radius-full)' }}>
-              GeM Ready
-            </span>
-          </div>
+          {/* Symbol only - visible when sidebar is closed, disappears when sidebar opens */}
+          {!sidebarOpen && (
+            <div
+              onClick={() => navigate('/startup/dashboard')}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              title="IPPS Setu"
+            >
+              <img
+                src="/logo.png"
+                alt="IPPS Logo"
+                style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'contain', background: 'white', padding: 2, flexShrink: 0 }}
+              />
+            </div>
+          )}
+
+          {/* Pipeline bar: shown when sidebar is closed, hidden when sidebar is open */}
+          {!sidebarOpen && (
+            <div className="pipeline-bar" role="navigation" aria-label="Startup innovation pipeline">
+              {pipelineSteps.map((step, idx) => (
+                <div key={step.label} className="pipeline-step">
+                  <button
+                    type="button"
+                    className={`pipeline-step-btn ${isActive(step.path) ? 'active' : ''}`}
+                    onClick={() => navigate(step.path)}
+                  >
+                    <span className={`pipeline-step-count ${idx === 0 ? 'orange' : ''}`}>{step.count}</span>
+                    <span>{step.label}</span>
+                  </button>
+                  {idx < pipelineSteps.length - 1 && (
+                    <ChevronRight size={14} className="pipeline-arrow" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-            
-            {/* Theme Toggle Button added here */}
-            <div style={{ position: 'relative' }}>
-              <button className="btn btn-icon btn-secondary" onClick={toggleTheme} title="Toggle Theme" style={{ marginRight: '8px' }}>
-                {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
-              </button>
+            <div className="su-badges" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: 'var(--indigo-400)', fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 'var(--radius-full)' }}>
+                DPIIT Recognised
+              </span>
+              <span style={{ background: 'rgba(45,212,191,0.1)', border: '1px solid rgba(45,212,191,0.25)', color: 'var(--teal-400)', fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 'var(--radius-full)' }}>
+                GeM Ready
+              </span>
             </div>
 
+            {/* Theme Toggle Button */}
+            <button className="btn btn-icon btn-secondary" onClick={toggleTheme} title="Toggle Theme">
+              {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+            </button>
+
+            {/* Notifications */}
             <div style={{ position: 'relative' }}>
-              <button className="btn btn-icon btn-secondary"><Bell size={17} /></button>
+              <button
+                className="btn btn-icon btn-secondary"
+                onClick={() => navigate('/startup/notifications')}
+                title="Notifications"
+              >
+                <Bell size={17} />
+              </button>
               <div className="notif-dot" />
             </div>
+
+            {/* User Profile */}
             {user && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+                onClick={() => navigate('/startup/profile')}
+              >
                 <div className="avatar" style={{ background: user.avatarColor || '#6366f1' }}>{user.avatar}</div>
-                <div>
+                <div className="user-profile-text">
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{user.name}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{user.company}</div>
                 </div>
@@ -164,8 +213,11 @@ export default function StartupLayout({ children }) {
       </div>
 
       <style>{`
+        @media (max-width: 1024px) {
+          .su-badges { display: none !important; }
+        }
         @media (max-width: 768px) {
-          #mobile-menu-btn-su { display: flex !important; }
+          .user-profile-text { display: none !important; }
         }
       `}</style>
     </div>

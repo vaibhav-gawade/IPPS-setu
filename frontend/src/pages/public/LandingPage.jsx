@@ -1,10 +1,10 @@
 // src/pages/public/LandingPage.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { platformStats } from '../../data/mockData';
 import {
   ArrowRight, CheckCircle, ChevronRight, Menu, X, Globe, Shield,
-  Zap, TrendingUp, Users, Target, BarChart3, Star
+  Zap, TrendingUp, Users, Target, BarChart3, Star, Sun, Moon
 } from 'lucide-react';
 
 const processSteps = [
@@ -46,6 +46,18 @@ const features = [
 export default function LandingPage() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('ipps-theme') || 'dark');
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+    }
+    localStorage.setItem('ipps-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
   return (
     <div className="landing-hero" style={{ background: 'var(--bg-primary)' }}>
@@ -65,7 +77,10 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div className="landing-nav-actions">
+        <div className="landing-nav-actions" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button className="btn btn-icon btn-secondary" onClick={toggleTheme} title="Toggle Theme" aria-label="Toggle Theme">
+            {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+          </button>
           <button className="btn btn-secondary btn-sm" onClick={() => navigate('/login')}>Login</button>
           <button className="btn btn-primary btn-sm" onClick={() => navigate('/login')}>Get Started</button>
         </div>
@@ -85,7 +100,10 @@ export default function LandingPage() {
           {['Home', 'How It Works', 'Challenges', 'Startups', 'About'].map(link => (
             <div key={link} style={{ padding: '10px 0', color: 'var(--text-secondary)', fontSize: 14, borderBottom: '1px solid var(--border-color)' }}>{link}</div>
           ))}
-          <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+          <div style={{ display: 'flex', gap: 10, marginTop: 12, alignItems: 'center' }}>
+            <button className="btn btn-icon btn-secondary" onClick={toggleTheme} title="Toggle Theme" style={{ width: 38, height: 38 }}>
+              {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+            </button>
             <button className="btn btn-secondary btn-sm" onClick={() => navigate('/login')} style={{ flex: 1 }}>Login</button>
             <button className="btn btn-primary btn-sm" onClick={() => navigate('/login')} style={{ flex: 1 }}>Get Started</button>
           </div>

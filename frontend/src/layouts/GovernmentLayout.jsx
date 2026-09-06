@@ -36,7 +36,7 @@ export default function GovernmentLayout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useApp();
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('ipps-theme') || 'dark');
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function GovernmentLayout({ children }) {
 
   const SidebarContent = () => (
     <>
-      <div className="sidebar-logo" onClick={() => navigate('/gov/dashboard')} style={{ cursor: 'pointer' }}>
+      <div className="sidebar-logo" onClick={() => navigate('/gov/dashboard')} style={{ cursor: 'pointer', padding: '16px' }}>
         <Logo />
       </div>
 
@@ -69,7 +69,7 @@ export default function GovernmentLayout({ children }) {
           <div
             key={path}
             className={`sidebar-item ${isActive(path) ? 'active' : ''}`}
-            onClick={() => { navigate(path); setMobileOpen(false); }}
+            onClick={() => navigate(path)}
           >
             <Icon className="sidebar-icon" size={18} />
             <span>{label}</span>
@@ -99,68 +99,68 @@ export default function GovernmentLayout({ children }) {
   );
 
   return (
-    <div className="app-layout">
-      {/* Desktop Sidebar */}
-      <aside className="app-sidebar">
+    <div className={`app-layout ${sidebarOpen ? 'sidebar-open' : ''}`}>
+      {/* Collapsible Sidebar */}
+      <aside className="app-sidebar" aria-label="Government Navigation">
         <SidebarContent />
       </aside>
-
-      {/* Mobile Sidebar Overlay */}
-      {mobileOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 200, display: 'flex' }}>
-          <div style={{ flex: 1, background: 'rgba(0,0,0,0.6)' }} onClick={() => setMobileOpen(false)} />
-          <aside style={{
-            width: 'var(--sidebar-width)',
-            background: 'var(--bg-sidebar)',
-            height: '100%',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            borderRight: '1px solid var(--border-color)',
-            position: 'absolute',
-            left: 0,
-          }}>
-            <SidebarContent />
-          </aside>
-        </div>
-      )}
 
       <div className="app-main">
         {/* Topbar */}
         <header className="app-topbar">
+          {/* 4-Bar Menu Toggle Button (Morphs to X when sidebar is open) */}
           <button
-            className="btn btn-icon btn-secondary"
-            style={{ display: 'none' }}
-            onClick={() => setMobileOpen(!mobileOpen)}
-            id="mobile-menu-btn"
+            type="button"
+            className={`nsp-menu-btn ${sidebarOpen ? 'open' : ''}`}
+            onClick={() => setSidebarOpen(prev => !prev)}
+            title={sidebarOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
+            aria-label={sidebarOpen ? "Close Navigation Menu" : "Open Navigation Menu"}
           >
-            <Menu size={18} />
+            <div className="nsp-menu-btn-lines">
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
           </button>
 
-          {/* Pipeline Steps */}
-          <div className="pipeline-bar" style={{ flex: 1, overflowX: 'auto', display: 'flex', alignItems: 'center', gap: 0, padding: 0 }}>
-            {pipelineSteps.map((step, idx) => (
-              <div key={step.label} className="pipeline-step">
-                <button
-                  className={`pipeline-step-btn ${isActive(step.path) ? 'active' : ''}`}
-                  onClick={() => navigate(step.path)}
-                >
-                  <span className={`pipeline-step-count ${idx === 0 ? 'orange' : ''}`}>{step.count}</span>
-                  {step.label}
-                </button>
-                {idx < pipelineSteps.length - 1 && (
-                  <ChevronRight size={14} className="pipeline-arrow" />
-                )}
-              </div>
-            ))}
-          </div>
+          {/* Symbol only - visible when sidebar is closed, disappears when sidebar opens */}
+          {!sidebarOpen && (
+            <div
+              onClick={() => navigate('/gov/dashboard')}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+              title="IPPS Setu"
+            >
+              <img
+                src="/logo.png"
+                alt="IPPS Logo"
+                style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'contain', background: 'white', padding: 2, flexShrink: 0 }}
+              />
+            </div>
+          )}
+
+          {/* Pipeline Steps: shown when sidebar is closed, hidden when sidebar is open */}
+          {!sidebarOpen && (
+            <div className="pipeline-bar" role="navigation" aria-label="Government challenge pipeline">
+              {pipelineSteps.map((step, idx) => (
+                <div key={step.label} className="pipeline-step">
+                  <button
+                    type="button"
+                    className={`pipeline-step-btn ${isActive(step.path) ? 'active' : ''}`}
+                    onClick={() => navigate(step.path)}
+                  >
+                    <span className={`pipeline-step-count ${idx === 0 ? 'orange' : ''}`}>{step.count}</span>
+                    <span>{step.label}</span>
+                  </button>
+                  {idx < pipelineSteps.length - 1 && (
+                    <ChevronRight size={14} className="pipeline-arrow" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ fontSize: 12, color: 'var(--teal-400)', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--teal-400)', display: 'inline-block', boxShadow: '0 0 8px var(--teal-400)' }} />
-              Transparent · Rule-based · Auditable
-            </div>
-
             <div style={{ position: 'relative' }}>
               <button className="btn btn-icon btn-secondary" onClick={toggleTheme} title="Toggle Theme" style={{ marginRight: '8px' }}>
                 {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
@@ -168,7 +168,7 @@ export default function GovernmentLayout({ children }) {
             </div>
             
             <div style={{ position: 'relative' }}>
-              <button className="btn btn-icon btn-secondary">
+              <button className="btn btn-icon btn-secondary" onClick={() => navigate('/gov/notifications')} title="Notifications">
                 <Bell size={17} />
               </button>
               <div className="notif-dot" />
@@ -177,7 +177,7 @@ export default function GovernmentLayout({ children }) {
             {user && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div className="avatar" style={{ background: user.avatarColor || '#0d9488' }}>{user.avatar}</div>
-                <div style={{ display: 'none' }}>
+                <div className="gov-user-text" style={{ display: 'none' }}>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{user.name}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{user.department}</div>
                 </div>
@@ -193,8 +193,8 @@ export default function GovernmentLayout({ children }) {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          #mobile-menu-btn { display: flex !important; }
+        @media (min-width: 769px) {
+          .gov-user-text { display: block !important; }
         }
       `}</style>
     </div>
