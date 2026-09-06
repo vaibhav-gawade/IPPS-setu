@@ -1,13 +1,22 @@
-// src/pages/startup/ApplicationsPage.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { mockApplications, mockChallenges } from '../../data/mockData';
-import { Store, ChevronRight, HandHeart, FileText, SearchCheck, ClipboardList, Star, Rocket } from 'lucide-react';
+import {
+  Store,
+  ChevronRight,
+  HandHeart,
+  FileText,
+  SearchCheck,
+  ClipboardList,
+  Star,
+  Rocket,
+  ChevronDown,
+  Check,
+} from 'lucide-react';
 
 const MY_STARTUP_ID = 'ST-003';
 
-// Stage order + the icon shown inside each timeline circle.
 const stages = [
   { key: 'Submitted', icon: FileText },
   { key: 'Screening', icon: SearchCheck },
@@ -15,6 +24,7 @@ const stages = [
   { key: 'Shortlisted', icon: Star },
   { key: 'Pilot', icon: Rocket },
 ];
+
 const stageKeys = stages.map(s => s.key);
 
 const badgeFor = {
@@ -26,143 +36,464 @@ const badgeFor = {
   Rejected: 'badge-rejected',
 };
 
-const titleFor = (challengeId) => mockChallenges.find(c => c.id === challengeId)?.title || challengeId;
+const titleFor = challengeId =>
+  mockChallenges.find(c => c.id === challengeId)?.title ||
+  challengeId;
 
 export default function ApplicationsPage() {
   const navigate = useNavigate();
   const { proposals } = useApp();
-  const [statusFilter, setStatusFilter] = useState('');
 
-  const all = [...proposals, ...mockApplications.filter(a => a.startupId === MY_STARTUP_ID)];
-  const rows = all.filter(a => !statusFilter || a.status === statusFilter);
+  const [statusFilter, setStatusFilter] =
+    useState('');
+
+  const [dropdownOpen, setDropdownOpen] =
+    useState(false);
+
+  const all = [
+    ...proposals,
+    ...mockApplications.filter(
+      a => a.startupId === MY_STARTUP_ID
+    ),
+  ];
+
+  const rows = all.filter(
+    a => !statusFilter || a.status === statusFilter
+  );
+
+  const selectedStatus =
+    statusFilter || 'All Statuses';
 
   return (
-    <div className="page-enter" data-testid="applications-page">
+    <div
+      className="page-enter"
+      data-testid="applications-page"
+    >
       <div className="section-header">
         <div>
-          <h1 className="section-title" data-testid="applications-title">My Applications</h1>
-          <p className="section-subtitle">Track every proposal through screening, evaluation, pilot and procurement</p>
+          <h1
+            className="section-title"
+            data-testid="applications-title"
+          >
+            My Applications
+          </h1>
+
+          <p className="section-subtitle">
+            Track every proposal through screening,
+            evaluation, pilot and procurement
+          </p>
         </div>
+
         <div className="section-actions">
-          <select className="filter-select" value={statusFilter} onChange={e => setStatusFilter(e.target.value)} data-testid="applications-status-filter">
-            <option value="">All Statuses</option>
-            {stageKeys.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <button className="btn btn-primary" onClick={() => navigate('/startup/marketplace')} data-testid="applications-browse-button">
-            <Store size={16} /> Browse Challenges
+          <div className="custom-filter-dropdown">
+            <button
+              type="button"
+              className={`custom-filter-trigger ${
+                dropdownOpen
+                  ? 'custom-filter-trigger-open'
+                  : ''
+              }`}
+              onClick={() =>
+                setDropdownOpen(!dropdownOpen)
+              }
+              data-testid="applications-status-filter"
+            >
+              <span>{selectedStatus}</span>
+
+              <ChevronDown
+                size={16}
+                className={`custom-filter-arrow ${
+                  dropdownOpen
+                    ? 'custom-filter-arrow-open'
+                    : ''
+                }`}
+              />
+            </button>
+
+            {dropdownOpen && (
+              <div className="custom-filter-menu">
+                <button
+                  type="button"
+                  className={`custom-filter-option ${
+                    statusFilter === ''
+                      ? 'custom-filter-option-selected'
+                      : ''
+                  }`}
+                  onClick={() => {
+                    setStatusFilter('');
+                    setDropdownOpen(false);
+                  }}
+                >
+                  <span>All Statuses</span>
+
+                  {statusFilter === '' && (
+                    <Check
+                      size={14}
+                      className="custom-filter-check"
+                    />
+                  )}
+                </button>
+
+                {stageKeys.map(s => (
+                  <button
+                    key={s}
+                    type="button"
+                    className={`custom-filter-option ${
+                      statusFilter === s
+                        ? 'custom-filter-option-selected'
+                        : ''
+                    }`}
+                    onClick={() => {
+                      setStatusFilter(s);
+                      setDropdownOpen(false);
+                    }}
+                  >
+                    <span>{s}</span>
+
+                    {statusFilter === s && (
+                      <Check
+                        size={14}
+                        className="custom-filter-check"
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button
+            className="btn btn-primary"
+            onClick={() =>
+              navigate('/startup/marketplace')
+            }
+            data-testid="applications-browse-button"
+          >
+            <Store size={16} />
+            Browse Challenges
           </button>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 12,
+          marginBottom: 20,
+          flexWrap: 'wrap',
+        }}
+      >
         {[
-          { label: 'Total', value: all.length, color: 'var(--text-primary)' },
-          { label: 'In Evaluation', value: all.filter(a => a.status === 'Evaluation').length, color: 'var(--amber-300)' },
-          { label: 'Shortlisted', value: all.filter(a => a.status === 'Shortlisted').length, color: 'var(--green-400)' },
-          { label: 'Submitted', value: all.filter(a => a.status === 'Submitted').length, color: 'var(--blue-400)' },
+          {
+            label: 'Total',
+            value: all.length,
+            color: 'var(--text-primary)',
+          },
+          {
+            label: 'In Evaluation',
+            value: all.filter(
+              a => a.status === 'Evaluation'
+            ).length,
+            color: 'var(--amber-300)',
+          },
+          {
+            label: 'Shortlisted',
+            value: all.filter(
+              a => a.status === 'Shortlisted'
+            ).length,
+            color: 'var(--green-400)',
+          },
+          {
+            label: 'Submitted',
+            value: all.filter(
+              a => a.status === 'Submitted'
+            ).length,
+            color: 'var(--blue-400)',
+          },
         ].map(s => (
           <div
             key={s.label}
             className="stat-chip"
             style={{
-              background: 'var(--bg-card)', border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-md)', padding: '8px 16px',
-              display: 'flex', alignItems: 'center', gap: 8,
+              background: 'var(--bg-card)',
+              border:
+                '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-md)',
+              padding: '8px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
             }}
-            data-testid={`applications-stat-${s.label.toLowerCase().replace(/\s/g, '-')}`}
           >
-            <span style={{ fontSize: 18, fontWeight: 800, color: s.color }}>{s.value}</span>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{s.label}</span>
+            <span
+              style={{
+                fontSize: 18,
+                fontWeight: 800,
+                color: s.color,
+              }}
+            >
+              {s.value}
+            </span>
+
+            <span
+              style={{
+                fontSize: 12,
+                color: 'var(--text-muted)',
+              }}
+            >
+              {s.label}
+            </span>
           </div>
         ))}
       </div>
 
       {rows.length === 0 ? (
-        <div className="empty-state" data-testid="applications-empty-state">
-          <div className="empty-state-icon">📝</div>
-          <div className="empty-state-title">No applications yet</div>
-          <p style={{ marginBottom: 16 }}>Browse the marketplace and submit your first proposal.</p>
-          <button className="btn btn-primary" onClick={() => navigate('/startup/marketplace')} data-testid="applications-empty-browse-button">
+        <div
+          className="empty-state"
+          data-testid="applications-empty-state"
+        >
+          <div className="empty-state-icon">
+            📝
+          </div>
+
+          <div className="empty-state-title">
+            No applications yet
+          </div>
+
+          <p style={{ marginBottom: 16 }}>
+            Browse the marketplace and submit your first
+            proposal.
+          </p>
+
+          <button
+            className="btn btn-primary"
+            onClick={() =>
+              navigate('/startup/marketplace')
+            }
+          >
             Browse Challenges
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }} data-testid="applications-list">
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+          }}
+          data-testid="applications-list"
+        >
           {rows.map(a => {
-            const stageIdx = Math.max(0, stageKeys.indexOf(a.status));
+            const stageIdx = Math.max(
+              0,
+              stageKeys.indexOf(a.status)
+            );
+
             return (
-              <div className="card" key={a.id} data-testid={`application-card-${a.id}`}>
+              <div
+                className="card"
+                key={a.id}
+                data-testid={`application-card-${a.id}`}
+              >
                 <div className="challenge-card-header">
                   <div>
-                    <code style={{ fontSize: 11.5, color: 'var(--teal-400)' }}>{a.id}</code>
-                    <div className="challenge-card-title" style={{ marginTop: 4 }}>{titleFor(a.challengeId)}</div>
-                    <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 2 }}>
-                      Challenge {a.challengeId} · submitted {a.submittedDate}
+                    <code
+                      style={{
+                        fontSize: 11.5,
+                        color: 'var(--teal-400)',
+                      }}
+                    >
+                      {a.id}
+                    </code>
+
+                    <div
+                      className="challenge-card-title"
+                      style={{ marginTop: 4 }}
+                    >
+                      {titleFor(a.challengeId)}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: 11.5,
+                        color: 'var(--text-muted)',
+                        marginTop: 2,
+                      }}
+                    >
+                      Challenge {a.challengeId} ·
+                      submitted {a.submittedDate}
                     </div>
                   </div>
-                  <span className={`badge ${badgeFor[a.status] || ''}`} data-testid={`application-status-${a.id}`}>{a.status}</span>
+
+                  <span
+                    className={`badge ${
+                      badgeFor[a.status] || ''
+                    }`}
+                    data-testid={`application-status-${a.id}`}
+                  >
+                    {a.status}
+                  </span>
                 </div>
 
-                {/* Progress timeline */}
                 <div
                   className="timeline-track"
-                  style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))`, marginTop: 16 }}
-                  data-testid={`application-timeline-${a.id}`}
+                  style={{
+                    gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))`,
+                    marginTop: 16,
+                  }}
                 >
-                  {stages.map(({ key, icon: StageIcon }, i) => {
-                    const state = i < stageIdx ? 'completed' : i === stageIdx ? 'active' : 'pending';
-                    return (
-                      <div
-                        key={key}
-                        className={`timeline-node ${i <= stageIdx ? 'seg-in-done' : ''} ${i < stageIdx ? 'seg-out-done' : ''}`}
-                        data-testid={`timeline-step-${a.id}-${key.toLowerCase()}`}
-                        title={key}
-                      >
-                        <div className={`timeline-node-dot ${state}`}>
-                          <StageIcon size={16} strokeWidth={2.2} />
+                  {stages.map(
+                    (
+                      { key, icon: StageIcon },
+                      i
+                    ) => {
+                      const state =
+                        i < stageIdx
+                          ? 'completed'
+                          : i === stageIdx
+                          ? 'active'
+                          : 'pending';
+
+                      return (
+                        <div
+                          key={key}
+                          className={`timeline-node ${
+                            i <= stageIdx
+                              ? 'seg-in-done'
+                              : ''
+                          } ${
+                            i < stageIdx
+                              ? 'seg-out-done'
+                              : ''
+                          }`}
+                          title={key}
+                        >
+                          <div
+                            className={`timeline-node-dot ${state}`}
+                          >
+                            <StageIcon
+                              size={16}
+                              strokeWidth={2.2}
+                            />
+                          </div>
+
+                          <div
+                            className={`timeline-node-label ${state}`}
+                          >
+                            {key}
+                          </div>
                         </div>
-                        <div className={`timeline-node-label ${state}`}>{key}</div>
-                      </div>
-                    );
-                  })}
+                      );
+                    }
+                  )}
                 </div>
 
                 {a.overallScore != null && (
                   <div style={{ marginTop: 14 }}>
-                    <div className="card-title" style={{ marginBottom: 6 }}>Evaluation Score</div>
-                    <div className="progress-bar">
-                      <div className="progress-bar-fill green" style={{ width: `${a.overallScore}%` }} />
+                    <div
+                      className="card-title"
+                      style={{ marginBottom: 6 }}
+                    >
+                      Evaluation Score
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{a.overallScore} / 100</div>
+
+                    <div className="progress-bar">
+                      <div
+                        className="progress-bar-fill green"
+                        style={{
+                          width: `${a.overallScore}%`,
+                        }}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: 'var(--text-muted)',
+                        marginTop: 4,
+                      }}
+                    >
+                      {a.overallScore} / 100
+                    </div>
                   </div>
                 )}
 
                 {a.proposedSolution && (
-                  <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: 14 }}>
-                    {a.proposedSolution.slice(0, 180)}{a.proposedSolution.length > 180 ? '…' : ''}
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.6,
+                      marginTop: 14,
+                    }}
+                  >
+                    {a.proposedSolution.slice(
+                      0,
+                      180
+                    )}
+                    {a.proposedSolution.length > 180
+                      ? '…'
+                      : ''}
                   </p>
                 )}
 
-                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 12 }}>
-                  {a.pilotBudget && <span className="challenge-meta-item">💰 {a.pilotBudget}</span>}
-                  {a.pilotDuration && <span className="challenge-meta-item">⏱ {a.pilotDuration}</span>}
-                  {a.teamLead && <span className="challenge-meta-item">👤 {a.teamLead}</span>}
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: 16,
+                    flexWrap: 'wrap',
+                    marginTop: 12,
+                  }}
+                >
+                  {a.pilotBudget && (
+                    <span className="challenge-meta-item">
+                      💰 {a.pilotBudget}
+                    </span>
+                  )}
+
+                  {a.pilotDuration && (
+                    <span className="challenge-meta-item">
+                      ⏱ {a.pilotDuration}
+                    </span>
+                  )}
+
+                  {a.teamLead && (
+                    <span className="challenge-meta-item">
+                      👤 {a.teamLead}
+                    </span>
+                  )}
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 14 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    gap: 8,
+                    marginTop: 14,
+                  }}
+                >
                   <button
                     className="btn btn-sm btn-secondary"
-                    onClick={() => navigate(`/startup/experts?challenge=${a.challengeId}`)}
-                    data-testid={`application-find-experts-${a.id}`}
+                    onClick={() =>
+                      navigate(
+                        `/startup/experts?challenge=${a.challengeId}`
+                      )
+                    }
                   >
-                    <HandHeart size={13} /> Find Experts
+                    <HandHeart size={13} />
+                    Find Experts
                   </button>
+
                   <button
                     className="btn btn-sm btn-secondary"
-                    onClick={() => navigate(`/startup/marketplace/${a.challengeId}`)}
-                    data-testid={`application-view-challenge-${a.id}`}
+                    onClick={() =>
+                      navigate(
+                        `/startup/marketplace/${a.challengeId}`
+                      )
+                    }
                   >
-                    View Challenge <ChevronRight size={13} />
+                    View Challenge
+                    <ChevronRight size={13} />
                   </button>
                 </div>
               </div>
